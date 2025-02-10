@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="styles.css"> <!-- Optional: Add your CSS -->
+</head>
+<body>
+
+  <h1>Login</h1>
+  <form id="login-form" action="/login" method="POST">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required />
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required />
+
+    <button type="submit">Login</button>
+  </form>
+
+  <script>
+    // Optional: Add client-side validation or other JavaScript functionality here
+    // Example: Prevent form submission if fields are empty
+    document.getElementById("login-form").addEventListener("submit", function(event) {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      if (!username || !password) {
+        event.preventDefault(); // Prevent form submission
+        alert("Please fill in both fields.");
+      }
+    });
+  </script>
+</body>
+</html>

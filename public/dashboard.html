@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Welcome to the Dashboard</h1>
+  </header>
+
+  <div class="dashboard-container">
+    <h2>Sites</h2>
+    <div id="site-list">
+      <!-- Sites will be loaded here -->
+    </div>
+  </div>
+
+  <script>
+    async function fetchSites() {
+      try {
+        const response = await fetch('/sites');
+        if (!response.ok) {
+          throw new Error('Failed to fetch sites');
+        }
+        const sites = await response.json();
+        displaySites(sites);
+      } catch (error) {
+        console.error('Error fetching sites:', error);
+        document.getElementById('site-list').innerHTML = '<div class="no-results">Failed to load sites</div>';
+      }
+    }
+
+    function displaySites(sites) {
+      const siteList = document.getElementById('site-list');
+      siteList.innerHTML = '';
+      if (sites.length === 0) {
+        siteList.innerHTML = '<div class="no-results">No sites available</div>';
+      } else {
+        sites.forEach(site => {
+          const siteItem = document.createElement('div');
+          siteItem.classList.add('site-item');
+          const siteName = site.site_name || 'Unnamed Site';
+          const button = document.createElement('button');
+          button.textContent = siteName;
+          // Corrected URL with backticks
+          button.onclick = () => window.location.href = `/inspections?site=${encodeURIComponent(site.site_name)}`;
+          siteItem.appendChild(button);
+          siteList.appendChild(siteItem);
+        });
+      }
+    }
+
+    window.onload = fetchSites;
+  </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inspections</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1 id="site-header">Inspections for Site</h1>
+    <button onclick="window.history.back()">Back to Dashboard</button>
+  </header>
+
+  <!-- Search Bar -->
+  <input type="text" id="search-bar" placeholder="Search inspections..." onkeyup="searchInspections()">
+
+  <div id="inspections-container">
+    <ul id="inspections-list">
+      <!-- Inspections will be dynamically loaded here -->
+    </ul>
+  </div>
+
+  <script>
+    // Helper function to get query parameter
+    function getQueryParam(param) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(param);
+    }
+
+    const siteName = getQueryParam('site');
+    document.getElementById('site-header').textContent = `Inspections for ${siteName}`;
+
+    async function fetchInspections() {
+      try {
+        const response = await fetch(`/site/${encodeURIComponent(siteName)}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch inspections');
+        }
+        const inspections = await response.json();
+        displayInspections(inspections);
+      } catch (error) {
+        console.error('Error fetching inspections:', error);
+        document.getElementById('inspections-list').innerHTML = '<li>Failed to load inspections</li>';
+      }
+    }
+
+    function displayInspections(inspections) {
+      const inspectionsList = document.getElementById('inspections-list');
+      inspectionsList.innerHTML = '';
+      if (inspections.length === 0) {
+        inspectionsList.innerHTML = '<li>No inspections available for this site</li>';
+      } else {
+        inspections.forEach(inspection => {
+          const li = document.createElement('li');
+          // Use the "tag" column for inspection name
+          li.textContent = inspection.tag || 'Unnamed Inspection';
+          li.style.cursor = 'pointer';
+          li.onclick = () => window.location.href = `/inspection?inspection=${inspection.id}`;
+          inspectionsList.appendChild(li);
+        });
+      }
+    }
+
+    function searchInspections() {
+      const query = document.getElementById('search-bar').value.toLowerCase();
+      const items = document.querySelectorAll('#inspections-list li');
+      items.forEach(item => {
+        if (item.textContent.toLowerCase().includes(query)) {
+          item.style.display = '';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    window.onload = fetchInspections;
+  </script>
+</body>
+</html>

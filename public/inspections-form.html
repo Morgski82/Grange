@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Inspection</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Edit Inspection</h1>
+    <button onclick="window.history.back()">Back to Inspections</button>
+  </header>
+
+  <form id="inspection-form">
+    <label for="tag">Inspection Name (Tag):</label>
+    <input type="text" id="tag" name="tag"><br><br>
+
+    <label for="siteField">Site:</label>
+    <input type="text" id="siteField" name="siteField"><br><br>
+
+    <label for="col9">Column 9:</label>
+    <input type="text" id="col9" name="col9"><br><br>
+
+    <button type="submit">Save Changes</button>
+  </form>
+
+  <script>
+    // Helper function to extract inspection ID from the URL query parameter
+    function getInspectionIdFromURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('inspection'); // Extract the 'inspection' query parameter
+    }
+
+    const inspectionId = getInspectionIdFromURL();  // Extract the ID from the URL query parameter
+
+    async function fetchInspectionDetails() {
+      try {
+        const response = await fetch(`/inspection?inspection=${inspectionId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch inspection details');
+        }
+        const inspection = await response.json();
+        document.getElementById('tag').value = inspection.tag || '';
+        document.getElementById('siteField').value = inspection.site || '';
+        document.getElementById('col9').value = inspection.column_9 || '';
+      } catch (error) {
+        console.error('Error fetching inspection details:', error);
+      }
+    }
+
+    document.getElementById('inspection-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const tag = document.getElementById('tag').value;
+      const siteField = document.getElementById('siteField').value;
+      const col9 = document.getElementById('col9').value;
+      try {
+        const response = await fetch(`/inspection/${inspectionId}`, {
+          method: 'PUT',  // Use PUT for updating existing resources
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ column_tag: tag, column_5: siteField, column_9: col9 })
+        });
+        if (!response.ok) {
+          throw new Error('Failed to update inspection');
+        }
+        alert('Inspection updated successfully');
+        window.location.href = `/inspections?site=${encodeURIComponent(siteField)}`;
+      } catch (error) {
+        console.error('Error updating inspection:', error);
+      }
+    });
+
+    window.onload = fetchInspectionDetails;
+  </script>
+</body>
+</html>

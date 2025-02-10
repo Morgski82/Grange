@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Site Inspections</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    .container {
+      width: 80%;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .inspection-list {
+      margin-top: 20px;
+    }
+    .inspection-item {
+      padding: 15px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Inspections for Site</h1>
+
+    <div id="inspection-list" class="inspection-list">
+      <!-- Inspections will be displayed here -->
+    </div>
+  </div>
+
+  <script>
+    // Fetch inspections for the specific site from the server
+    async function fetchInspections() {
+      const siteId = window.location.pathname.split('/')[2]; // Extract the site ID from the URL
+
+      try {
+        const response = await fetch(`/site/${siteId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch inspections');
+        }
+        const inspections = await response.json();
+        console.log('Fetched inspections:', inspections);
+        
+        displayInspections(inspections);
+      } catch (error) {
+        console.error('Error fetching inspections:', error);
+        document.getElementById('inspection-list').innerHTML = '<div class="no-results">Failed to load inspections</div>';
+      }
+    }
+
+    // Display inspections on the page
+    function displayInspections(inspections) {
+      const inspectionList = document.getElementById('inspection-list');
+      inspectionList.innerHTML = ''; // Clear existing inspections
+
+      if (inspections.length === 0) {
+        inspectionList.innerHTML = '<div class="no-results">No inspections found for this site</div>';
+      } else {
+        inspections.forEach(inspection => {
+          const inspectionItem = document.createElement('div');
+          inspectionItem.classList.add('inspection-item');
+          
+          inspectionItem.innerHTML = `
+            <strong>${inspection.name}</strong><br>
+            Location: ${inspection.location}<br>
+            Date: ${inspection.date}<br>
+          `;
+          
+          inspectionList.appendChild(inspectionItem);
+        });
+      }
+    }
+
+    window.onload = fetchInspections;
+  </script>
+
+</body>
+</html>
